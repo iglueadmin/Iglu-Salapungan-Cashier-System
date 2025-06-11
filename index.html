@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iglu - Salapungan Cashier System (Design Only)</title>
+  <link
+    href="https://api.fontshare.com/v2/css?f[]=open-sauce-one@400,700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* Reset and base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Open Sauce One', sans-serif;
+    }
+    body {
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8em 1em 2em;
+      gap: 2em;
+      min-height: 100vh;
+      position: relative;
+      z-index: 0;
+      background: url('https://github.com/user-attachments/assets/bc5acca3-30fc-451b-ae1d-15e2ad957ff0') 
+                  no-repeat center/cover fixed;
+    }
+    body::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-color: rgba(0,0,0,0.4);
+      z-index: -1;
+    }
+
+    /* Header */
+    header {
+      position: fixed; top: 0; left: 0; width: 100%;
+      display: flex; align-items: center; gap: 1em;
+      padding: 1em 2em;
+      background: linear-gradient(90deg,#00FFFF,#00cfd1);
+      box-shadow: 0 0 15px #00FFFF;
+      z-index: 10;
+    }
+    .logo {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px 3px #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+      margin-top: -20px;
+    }
+    .logo img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .header-text {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      animation: glowMove 3s ease-in-out infinite alternate;
+    }
+    @keyframes glowMove {
+      0%,100% {
+        text-shadow: 0 0 8px #fff,0 0 20px #0ff,0 0 30px #0ff;
+      }
+      50% {
+        text-shadow: 0 0 12px #a0f7ff,0 0 25px #a0f7ff,0 0 40px #a0f7ff;
+      }
+    }
+
+    /* Container and form layout */
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      align-items: center;
+    }
+    h1 {
+      font-size: 2rem;
+      color: #0ff;
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      color: #fff;
+      margin-top: .5em;
+    }
+
+    /* Text inputs */
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      max-width: 900px;
+      padding: .6em;
+      font-size: 1rem;
+      border: 2px solid #0ff;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.9);
+      color: #003d3d;
+      margin-bottom: 1em;
+    }
+    #cashierName {
+      font-size: 1.2rem;
+      font-weight: bold;
+      box-shadow: 0 0 10px #0ff;
+    }
+
+    select {
+      background: rgba(255,255,255,0.9);
+      font-weight: bold;
+    }
+
+    /* Item rows / discount section */
+    .item-row,
+    .discount-section,
+    .payment-section {
+      width: 100%;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 1em;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,255,255,0.2);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+      color: #fff;
+      font-weight: bold;
+    }
+    .item-field {
+      flex: 1 1 120px;
+      display: flex;
+      flex-direction: column;
+      gap: .3em;
+    }
+    .btn-remove {
+      background: linear-gradient(90deg,#f66,#f44);
+      color: #fff;
+      padding: .5em 1em;
+      border: none; border-radius: 8px;
+      box-shadow: 0 0 8px rgba(255,100,100,0.6);
+      cursor: pointer;
+      transition: .2s;
+    }
+    .btn-remove:hover {
+      background: linear-gradient(90deg,#f44,#f66);
+      box-shadow: 0 0 12px rgba(255,100,100,0.9);
+      transform: scale(1.03);
+    }
+    .buttons-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+      justify-content: center;
+      width: 100%;
+    }
+
+    /* Buttons */
+    button {
+      font-weight: bold;
+      padding: .75em 1.5em;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: .3s ease;
+      margin-top: .5em;
+    }
+    .btn-add {
+      background: linear-gradient(90deg,#0ff,#0cfd1);
+      color: #003d3d;
+      box-shadow: 0 0 10px rgba(0,255,255,0.5);
+    }
+    .btn-add:hover {
+      background: linear-gradient(90deg,#0cfd1,#0ff);
+      box-shadow: 0 0 15px rgba(0,255,255,0.8);
+      transform: translateY(-2px);
+    }
+    .btn-submit,
+    .btn-calculate {
+      background: linear-gradient(90deg,#0faa,#0d88);
+      color: #003d3d;
+      box-shadow: 0 0 10px rgba(0,255,170,0.5);
+    }
+    .btn-submit:hover,
+    .btn-calculate:hover {
+      background: linear-gradient(90deg,#0d88,#0faa);
+      box-shadow: 0 0 15px rgba(0,255,170,0.8);
+      transform: translateY(-2px);
+    }
+
+    /* Summary & status */
+    .summary {
+      width: 100%;
+      max-width: 900px;
+      text-align: right;
+      color: #0aaa;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-top: 1em;
+    }
+    #status {
+      margin-top: 1em;
+      width: 100%;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #0aaa;
+      background: #e0fcff;
+      border-radius: 10px;
+      padding: .75em;
+      font: 0.9rem monospace;
+      color: #00aaaa;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 600px) {
+      .item-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-HMxVQRNPTRZkJrCs8DkfTY2Oli9YHLx9Jg&s" alt="Logo" />
+    </div>
+    <div class="header-text">Salapungan Cashier System</div>
+  </header>
+
+  <div class="container">
+    <h1>Iglu - Salapungan Cashier System</h1>
+
+    <label for="cashierName">Cashier Name:</label>
+    <input type="text" id="cashierName" required />
+
+    <label for="paymentType">Payment Type:</label>
+    <select id="paymentType">
+      <option value="CASH">Cash</option>
+      <option value="GCASH">GCash</option>
+      <option value="MAYA">Maya</option>
+    </select>
+
+    <label for="discountType">Discount Type:</label>
+    <select id="discountType">
+      <option value="">None</option>
+      <option value="PWD">PWD</option>
+      <option value="SENIOR">Senior</option>
+    </select>
+
+    <div id="items"></div>
+    <button class="btn-add" onclick="addItem()">+ Add Item</button>
+
+    <div class="summary">
+      Total: ₱<span id="total">0.00</span>
+      <div>
+        <label for="cashGiven">Cash Given:</label>
+        <input type="number" id="cashGiven" step="0.01" oninput="calculateChange()" />
+      </div>
+      <div>Change: ₱<span id="change">0.00</span></div>
+    </div>
+
+    <button class="btn-submit" onclick="submitOrder()">Submit Order</button>
+    <div id="status"></div>
+  </div>
+
+  <script>
+    const endpoint = 'https://script.google.com/macros/s/AKfycbyi9N314-HFSwCSmB7cXaB14WOmU7ZJ826yUQFgzIdpsvAA_zrSzQ4SdUHurXdtI-Q_/exec';
+
+    function addItem() {
+      const container = document.createElement('div');
+      container.className = 'item-row';
+      container.innerHTML = `
+        <div class="item-field">
+          <label>Type:</label>
+          <input type="text" class="type" required />
+        </div>
+        <div class="item-field">
+          <label>Size:</label>
+          <input type="text" class="size" />
+        </div>
+        <div class="item-field">
+          <label>Price (₱):</label>
+          <input type="number" class="price" step="0.01" required />
+        </div>
+        <div class="item-field">
+          <label>Grams:</label>
+          <input type="number" class="grams" step="0.01" />
+        </div>
+        <div class="item-field">
+          <label>Reference No.:</label>
+          <input type="text" class="ref" />
+        </div>
+        <button class="btn-remove" onclick="removeItem(this)">Remove</button>
+      `;
+      document.getElementById('items').appendChild(container);
+      container.querySelector('.price').addEventListener('input', updateTotal);
+      updateTotal();
+    }
+
+    function removeItem(btn) {
+      btn.closest('.item-row').remove();
+      updateTotal();
+    }
+
+    function updateTotal() {
+      const discount = document.getElementById('discountType').value;
+      const prices = Array.from(document.querySelectorAll('.price'))
+                          .map(i => parseFloat(i.value) || 0);
+      let total = prices.reduce((sum, p) => sum + p, 0);
+      if (discount === 'PWD' || discount === 'SENIOR') total *= 0.8;
+      document.getElementById('total').textContent = total.toFixed(2);
+      calculateChange();
+    }
+
+    function calculateChange() {
+      const total = parseFloat(document.getElementById('total').textContent) || 0;
+      const cash = parseFloat(document.getElementById('cashGiven').value) || 0;
+      document.getElementById('change').textContent = (cash - total).toFixed(2);
+    }
+
+    async function submitOrder() {
+      updateTotal();
+
+      const cashierName = document.getElementById('cashierName').value.trim();
+      const paymentType = document.getElementById('paymentType').value;
+      const discountType = document.getElementById('discountType').value;
+      const items = Array.from(document.querySelectorAll('.item-row')).map(row => ({
+        type: row.querySelector('.type').value.trim(),
+        size: row.querySelector('.size').value.trim(),
+        price: parseFloat(row.querySelector('.price').value),
+        grams: row.querySelector('.grams').value.trim(),
+        ref: row.querySelector('.ref').value.trim(),
+      }));
+
+      if (!cashierName || items.some(i => !i.type || isNaN(i.price))) {
+        alert('Please fill all required fields.');
+        return;
+      }
+
+      const payload = { cashierName, paymentType, discountType, items };
+      try {
+        await fetch(endpoint, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        document.getElementById('status').textContent = '✅ Order submitted!';
+        document.getElementById('items').innerHTML = '';
+        document.getElementById('cashGiven').value = '';
+        document.getElementById('total').textContent = '0.00';
+        document.getElementById('change').textContent = '0.00';
+        addItem();
+      } catch (err) {
+        document.getElementById('status').textContent =
+          '❌ Error submitting order: ' + err.message;
+      }
+    }
+
+    addItem();
+    document
+      .getElementById('discountType')
+      .addEventListener('change', updateTotal);
+  </script>
+</body>
+</html>
