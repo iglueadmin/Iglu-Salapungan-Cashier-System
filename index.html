@@ -330,46 +330,58 @@
     }
 
     async function submitOrder() {
-      updateTotal();
+  updateTotal();
 
-      const cashierName = document.getElementById('cashierName').value.trim();
-      const paymentType = document.getElementById('paymentType').value;
-      const discountType = document.getElementById('discountType').value;
-      const items = Array.from(document.querySelectorAll('.item-row')).map(row => ({
-        type: row.querySelector('.type').value.trim(),
-        size: row.querySelector('.size').value.trim(),
-        price: parseFloat(row.querySelector('.price').value),
-        grams: row.querySelector('.grams').value.trim(),
-        ref: row.querySelector('.ref').value.trim(),
-      }));
+  const cashierName = document.getElementById('cashierName').value.trim();
+  const paymentType = document.getElementById('paymentType').value;
+  const discountType = document.getElementById('discountType').value;
+  const items = Array.from(document.querySelectorAll('.item-row')).map(row => ({
+    type: row.querySelector('.type').value.trim(),
+    size: row.querySelector('.size').value.trim(),
+    price: parseFloat(row.querySelector('.price').value),
+    grams: row.querySelector('.grams').value.trim(),
+    ref: row.querySelector('.ref').value.trim(),
+  }));
 
-      if (!cashierName || items.some(i => !i.type || isNaN(i.price))) {
-        alert('Please fill all required fields.');
-        return;
-      }
+  if (!cashierName || items.some(i => !i.type || isNaN(i.price))) {
+    alert('Please fill all required fields.');
+    return;
+  }
 
-      const payload = { cashierName, paymentType, discountType, items };
-      try {
-        await fetch(endpoint, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+  const statusDiv = document.getElementById('status');
+statusDiv.innerHTML = ''; // Clear previous status
 
-        document.getElementById('status').textContent = '✅ Order submitted!';
-        document.getElementById('items').innerHTML = '';
-        document.getElementById('cashGiven').value = '';
-        document.getElementById('total').textContent = '0.00';
-        document.getElementById('change').textContent = '0.00';
-        addItem();
-      } catch (err) {
-        document.getElementById('status').textContent =
-          '❌ Error submitting order: ' + err.message;
-      }
-    }
+for (let i = 0; i < items.length; i++) {
+  const singleItem = [items[i]];
+  const payload = { cashierName, paymentType, discountType, items: singleItem };
 
-    addItem();
+  try {
+    await fetch(endpoint, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const type = items[i].type || 'N/A';
+    statusDiv.innerHTML += `Item ${i + 1} (${type}): Order Recorded Successfully<br>`;
+
+  } catch (error) {
+    const type = items[i].type || 'N/A';
+    statusDiv.innerHTML += `Item ${i + 1} (${type}): Error sending order.<br>`;
+    console.error(error);
+  }
+}
+
+
+  // Reset form
+  document.getElementById('items').innerHTML = '';
+  document.getElementById('cashGiven').value = '';
+  document.getElementById('total').textContent = '0.00';
+  document.getElementById('change').textContent = '0.00';
+  addItem();
+}
+
     document
       .getElementById('discountType')
       .addEventListener('change', updateTotal);
